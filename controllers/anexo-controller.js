@@ -24,10 +24,12 @@ async function getAnexos(req, res) {
 async function postAnexos(req, res) {
     const dbConnect = dbo.getDb();
 
-    const anexo = {
-        concepto: req.body.concepto,
-        valores: req.body.valores
-    };
+    let concepto = req.body.concepto;
+    let valores = req.body.valores;
+
+    const anexo = {};
+
+    anexo[concepto] = valores
         
     dbConnect
         .collection("anexos")
