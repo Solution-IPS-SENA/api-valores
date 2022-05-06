@@ -14,7 +14,7 @@ async function getAnexos(req, res) {
             else {
                 let response = []
                 result.forEach(anexo => {
-                    response.push({ concepto: anexo.concepto, valores: anexo.valores });
+                    response.push(anexo);
                 }); 
                 res.status(200).json({ anexos: response });
             }
