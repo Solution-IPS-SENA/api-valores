@@ -3,63 +3,72 @@ const models = require('../models/anexos');
 
 async function getAnexos(req, res) {
     const dbConnect = dbo.getDb();
-    
+
     dbConnect
         .collection("anexos")
-        .find({})
-        .toArray((err, result) => {
+        .findOne({}, (err, anexos) => {
             if (err) {
                 res.status(400).json({ response: "Error obteniendo los anexos" })
             }
             else {
-                let response = []
-                result.forEach(anexo => {
-                    response.push(anexo);
-                }); 
-                res.status(200).json({ anexos: response });
+                delete anexos._id
+                res.status(200).send(anexos);
             }
         })
 };
 
 async function postAnexos(req, res) {
-    const dbConnect = dbo.getDb();
 
     let concepto = req.body.concepto;
-    let valores = req.body.valores;
+    let valor = req.body.valor;
 
-    const anexo = {};
+    const dbConnect = dbo.getDb();
 
-    anexo[concepto] = valores
-        
     dbConnect
         .collection("anexos")
-        .insertOne(anexo , function (err, result) {
+        .findOne({}, (err, anexos) => {
             if (err) {
-                res.status(400).json({ response: 'Error insertando anexo' });
-            } else {
-                res.status(201).json({ response: 'Anexo insertado correctamente' });
+                return res.status(500).json({ response: "Server error" })
+            }
+            else {
+                let operacion = { $set: {} }
+                operacion.$set[concepto] = valor;
+                dbConnect
+                    .collection("anexos")
+                    .updateOne({ _id: anexos._id }, operacion, function (err, result) {
+                        if (err) {
+                            res.status(400).json({ response: 'Error insertando anexo' });
+                        } else {
+                            res.status(201).json({ response: 'Anexo insertado correctamente' });
+                        }
+                    });
             }
         });
 }
 
-async function putAnexos(req, res) {
+async function deleteAnexos(req, res){
+    let concepto = req.body.concepto;
+
     const dbConnect = dbo.getDb();
 
-    const anexo = {
-        concepto: req.body.concepto
-    };
-
-    const actualizacion = {
-        $push: { valores : req.body.valor }
-    }
-        
     dbConnect
         .collection("anexos")
-        .updateOne(anexo, actualizacion, function (err, result) {
+        .findOne({}, (err, anexos) => {
             if (err) {
-                res.status(400).json({ response: 'Error insertando anexo' });
-            } else {
-                res.status(202).json({ response: 'Anexo actualizado correctamente' });
+                return res.status(500).json({ response: "Server error" })
+            }
+            else {
+                let operacion = { $unset: {} }
+                operacion.$unset[concepto] = "";
+                dbConnect
+                    .collection("anexos")
+                    .updateOne({ _id: anexos._id }, operacion, function (err, result) {
+                        if (err) {
+                            res.status(400).json({ response: 'Error eliminado anexo' });
+                        } else {
+                            res.status(201).json({ response: 'Anexo eliminado correctamente' });
+                        }
+                    });
             }
         });
 }
@@ -67,5 +76,5 @@ async function putAnexos(req, res) {
 module.exports = {
     getAnexos,
     postAnexos,
-    putAnexos
+    deleteAnexos
 }

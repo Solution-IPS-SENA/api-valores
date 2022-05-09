@@ -4,6 +4,6 @@ const anexoController = require('../controllers/anexo-controller');
 
 router.get('/anexos', anexoController.getAnexos);
 router.post('/anexos', anexoController.postAnexos);
-router.put('/anexos', anexoController.putAnexos);
+router.delete('/anexos', anexoController.deleteAnexos);
 
 module.exports = router;
