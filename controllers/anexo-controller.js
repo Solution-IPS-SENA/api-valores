@@ -1,5 +1,4 @@
 const dbo = require('../config/db');
-const models = require('../models/anexos');
 
 async function getAnexos(req, res) {
     const dbConnect = dbo.getDb();
